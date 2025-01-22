@@ -1,56 +1,28 @@
-# Store and Restrict Decorator Assignment
+# Notes
 
-This is the repository for the technical test of creating a Store class and a Restrict decorator to manage access to user-generated content and data.
+Thank you for the assignment, really enjoyed it !
 
-## Context
+## What I would like to improve
 
-We are dealing with a runtime-defined project with a lot of user-generated content and data. To efficiently manage this data, we needed a way to store generated state and define permission strategies. This led to the creation of the Store class and Restrict decorator. Any entity in our application can inherit from these classes, thereby having structured storage and permission-based access control.
+### Typing
 
-## Task Description
+Some typescript error still exist, (not fixed to avoid investing too much time in the project):
 
-In this task, you need to complete the `Store` class and the `Restrict` decorator using TypeScript. The `Store` class and `Restrict` decorator should work together to allow or disallow access to data fields based on the specified permissions.
+- **Decorator errors in the test file**: Looking into Typescript decorator doc should enlighten me.
+- **Store `unknown property` error (is not of the type StoreValue)**: Using the Store value type for unknown keys lead to other errors. If I had more time, I would create a new property `storeValues` instead of storing the values directly in the class.
 
-## Requirements
+### Security
 
-- The `Store` class should implement the `IStore` interface, and its methods need to be filled with the appropriate logic.
-- `Store` class should be able to:
-  - Store and manage different types of JSON values.
-  - Determine if a specific key is allowed to be read or written.
-  - Write new entries, and list all existing entries.
-  - Handle read and write operations for nested keys.
-- The `Restrict` decorator should be able to set the access permissions to the data fields of the classes that use it. The permissions can be:
-  - `"r"`: read-only
-  - `"w"`: write-only
-  - `"rw"`: read and write
-  - `"none"`: no access
+I like code that can't be missused, here it's still possible to access object properties when not using the intended methods.
+Using `Object.defineProperty` in Restrict is the answer but I had trouble with the Class constructor, and felt like I was spending too much time on it.
 
-## Technical Details
+### Code Quality
 
-You need to complete the following parts of the codebase:
+I've allowed some bad practices in, like using flags, ternaries, and a few methods with more than one responsibility.
 
-- The `Restrict` decorator function in `store.ts`
-- The methods of the `Store` class in `store.ts`
-- Add any additional code needed for your solution
+## What I would do to 10x the assignment
 
-You can use the test cases provided in `test.ts` to validate your implementation.
-
-## How to submit your solution
-
-1. Fork this repository.
-2. Implement the `Restrict` decorator, `Store` class and add any additional code needed.
-3. Push your changes to your forked repository.
-4. Send us the link to your forked repository.
-
-## Evaluation Criteria
-
-Your implementation will be evaluated based on the following criteria:
-
-- Code quality and clarity.
-- Correctness of the implementation, i.e., all test cases in `test.ts` should pass.
-- Adherence to TypeScript and JavaScript best practices.
-
-## Further Guidance
-
-While implementing, remember that the aim is not just to pass the tests but to also write clean, efficient, and well-structured code. Pay attention to details such as proper error handling, efficient data structures and algorithms, clear variable and function names, and good overall structure.
-
-Good luck!
+- Fix all previously mentionned issues.
+- Test/lint running CI.
+- Allow `paths` as parameters of `allowedToRead` and `allowedToWrite`.
+- `ts-jest` is going to feel slow quite soon, I'd change it with `swc` or `vitest`.
