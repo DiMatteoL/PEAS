@@ -20,33 +20,89 @@ export interface IStore {
   entries(): JSONObject;
 }
 
-export function Restrict(...params: unknown[]): any {
-}
+export const Restrict = (...params: [Permission] | []) => {
+  let [permission] = params;
+  return (target: Store, propertyKey: string) => {
+    let value: unknown;
+
+    Object.defineProperty(target, propertyKey, {
+      get() {
+        permission = permission || target.defaultPolicy;
+        if (!permission.includes("r")) {
+          throw new Error("No read access");
+        }
+        return value;
+      },
+      set(newValue: number) {
+        permission = permission || target.defaultPolicy;
+        if (!permission) {
+          value = newValue;
+          return;
+        }
+        if (!permission.includes("w")) {
+          throw new Error("No write access");
+        }
+        value = newValue;
+      },
+      enumerable: true,
+      configurable: true,
+    });
+  };
+};
 
 export class Store implements IStore {
   defaultPolicy: Permission = "rw";
 
   allowedToRead(key: string): boolean {
-    throw new Error("Method not implemented.");
+    try {
+      this.read(key);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   allowedToWrite(key: string): boolean {
-    throw new Error("Method not implemented.");
+    try {
+      this.write(key, "test");
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   read(path: string): StoreResult {
-    throw new Error("Method not implemented.");
+    const a = this[path as keyof this];
+    return this[path as keyof this] as StoreResult;
   }
 
   write(path: string, value: StoreValue): StoreValue {
-    throw new Error("Method not implemented.");
+    // @ts-ignore
+    this[path as keyof this] = value;
+    return value;
   }
 
   writeEntries(entries: JSONObject): void {
-    throw new Error("Method not implemented.");
+    for (const [key, value] of Object.entries(entries)) {
+      this.write(key, value);
+    }
   }
 
   entries(): JSONObject {
-    throw new Error("Method not implemented.");
+    return Object.fromEntries(
+      Object.entries(this).filter(
+        ([key]) =>
+          this.allowedToRead(key) &&
+          ![
+            "defaultPolicy",
+            "allowedToRead",
+            "allowedToWrite",
+            "read",
+            "write",
+            "writeEntries",
+            "entries",
+          ].includes(key)
+      )
+    );
   }
 }
