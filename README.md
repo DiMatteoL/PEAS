@@ -26,3 +26,4 @@ I've allowed some bad practices in, like using flags, ternaries, and a few metho
 - Test/lint running CI.
 - Allow `paths` as parameters of `allowedToRead` and `allowedToWrite`.
 - `ts-jest` is going to feel slow quite soon, I'd change it with `swc` or `vitest`.
+- Runtime checks (ex: with zod)
